@@ -104,19 +104,24 @@ export default function QuestMap({ quests, selectedId, onSelect, area, onAreaSel
 
         m.on('load', () => {
           if (cancelled) return;
+          // Soft satellite underlay: desaturated + washed toward the avocado palette, so the ground (trees, parks,
+          // water, parking lots) reads as real while the stylised roads/buildings stay on top.
+          m.addSource('sat', { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: 18 });
+          m.addLayer({ id: 'sat', type: 'raster', source: 'sat', paint: { 'raster-opacity': 0.5, 'raster-saturation': -0.45, 'raster-contrast': -0.15, 'raster-brightness-min': 0.12, 'raster-brightness-max': 0.98, 'raster-hue-rotate': 12, 'raster-fade-duration': 0 } });
+          m.setLight({ anchor: 'viewport', position: [1.4, 210, 55], intensity: 0.45, color: '#fff6df' });
           m.addSource('roads', { type: 'geojson', data: roadsGJ as never });
           m.addSource('bld', { type: 'geojson', data: bldGJ as never });
           m.addSource('hoods', { type: 'geojson', data: hoods });
           const byClass = (...v: (number | string)[]) => ['match', ['get', 'k'], 0, v[0], 1, v[1], 2, v[2], 3, v[3], v[4]] as never;
           m.addLayer({ id: 'roads-glow', type: 'line', source: 'roads', layout: { 'line-cap': 'round', 'line-join': 'round' },
-            paint: { 'line-color': T.roadCasing, 'line-opacity': 0.85, 'line-width': ['interpolate', ['linear'], ['zoom'], 10, byClass(2.6, 2.1, 1.6, 1.2, 0.9), 17, byClass(9, 7.5, 6.2, 5, 3.6)] as never } });
+            paint: { 'line-color': T.roadCasing, 'line-opacity': 0.55, 'line-width': ['interpolate', ['linear'], ['zoom'], 10, byClass(2.6, 2.1, 1.6, 1.2, 0.9), 17, byClass(9, 7.5, 6.2, 5, 3.6)] as never } });
           m.addLayer({ id: 'roads', type: 'line', source: 'roads', layout: { 'line-cap': 'round', 'line-join': 'round' },
-            paint: { 'line-color': byClass(...T.roads), 'line-opacity': 1, 'line-width': ['interpolate', ['linear'], ['zoom'], 10, byClass(1.5, 1.2, 0.9, 0.6, 0.45), 17, byClass(6, 5, 4, 3, 2)] as never } });
+            paint: { 'line-color': byClass(...T.roads), 'line-opacity': 0.88, 'line-width': ['interpolate', ['linear'], ['zoom'], 10, byClass(1.5, 1.2, 0.9, 0.6, 0.45), 17, byClass(6, 5, 4, 3, 2)] as never } });
           m.addLayer({ id: 'bld-line', type: 'line', source: 'bld', paint: { 'line-color': T.bldLine, 'line-width': 0.5, 'line-opacity': 0.35 } });
           m.addLayer({ id: 'bld', type: 'fill-extrusion', source: 'bld', paint: {
             'fill-extrusion-height': ['get', 'h'], 'fill-extrusion-base': 0,
             'fill-extrusion-color': ['interpolate', ['linear'], ['get', 'h'], 5, T.bldLow, 30, T.bldMid, 90, T.bldHigh] as never,
-            'fill-extrusion-opacity': 0.92, 'fill-extrusion-vertical-gradient': true } });
+            'fill-extrusion-opacity': 0.9, 'fill-extrusion-vertical-gradient': true } });
           m.addLayer({ id: 'hood-base', type: 'line', source: 'hoods', paint: { 'line-color': T.hood, 'line-width': 1.4, 'line-opacity': 0.55 } });
           // hover
           m.addLayer({ id: 'hood-fill', type: 'fill', source: 'hoods', filter: ['==', 'NAME', ''], paint: { 'fill-color': T.hoodHover, 'fill-opacity': 0.14 } });
