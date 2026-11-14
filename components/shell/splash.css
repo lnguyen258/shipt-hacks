@@ -1,0 +1,26 @@
+.rpgb-splash {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+  background: #eef3df; color: #3f5a2a;
+  transition: opacity .45s ease;
+}
+.rpgb-splash.is-fading { opacity: 0; pointer-events: none; }
+.rpgb-splash__title { font-size: 28px; font-weight: 800; letter-spacing: .02em; }
+.rpgb-splash__hint { font-size: 14px; font-weight: 600; opacity: .7; }
+.rpgb-splash__track { position: relative; width: min(420px, 80vw); height: 90px; }
+.rpgb-splash__ground { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; border-radius: 3px; background: #9bc06a; }
+.rpgb-splash__flag { position: absolute; right: -6px; bottom: 6px; font-size: 26px; }
+.rpgb-splash__walker {
+  position: absolute; left: 0; bottom: 4px; width: 64px;
+  animation: rpgb-walk var(--walk, 3600ms) linear forwards;
+}
+.rpgb-avo { display: block; overflow: visible; animation: rpgb-bob .45s ease-in-out infinite; transform-origin: 50% 100%; }
+.rpgb-avo__leg { transform-box: fill-box; transform-origin: 50% 0; }
+.rpgb-avo__leg--l { animation: rpgb-step .45s ease-in-out infinite; }
+.rpgb-avo__leg--r { animation: rpgb-step .45s ease-in-out infinite reverse; }
+@keyframes rpgb-walk { from { left: 0; } to { left: calc(100% - 64px); } }
+@keyframes rpgb-bob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-5px) rotate(3deg); } }
+@keyframes rpgb-step { 0%, 100% { transform: rotate(22deg); } 50% { transform: rotate(-22deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .rpgb-avo, .rpgb-avo__leg { animation: none; }
+}
